@@ -12,6 +12,14 @@
 #include <zephyr/bluetooth/conn.h>
 #include <dk_buttons_and_leds.h>
 #include "ble_attr.h"
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h>
+
+
+
+static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
+
 
 static struct bt_le_adv_param *adv_param = BT_LE_ADV_PARAM(
 	(BT_LE_ADV_OPT_CONNECTABLE |
@@ -119,26 +127,17 @@ struct bt_conn_cb connection_callbacks = {
 	.disconnected = on_disconnected,
 };
 
-static int init_button(void)
-{
-	int err;
 
-	err = dk_buttons_init(button_changed);
-	if (err) {
-		printk("Cannot init buttons (err: %d)\n", err);
-	}
 
-	return err;
-}
 
 int main(void)
 {
-	int blink_status = 0;
 	int err;
 
 	LOG_INF("Starting Lesson 4 - Exercise 2 \n");
 
 	err = dk_leds_init();
+
 	if (err) {
 		LOG_ERR("LEDs init failed (err %d)\n", err);
 		return -1;

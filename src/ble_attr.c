@@ -26,7 +26,6 @@
 
 LOG_MODULE_DECLARE(Lesson4_Exercise2);
 
-static bool notify_enabled;
 static bool notify_mysensor_enabled;
 static bool indicate_enabled;
 static bool button_state;
@@ -41,11 +40,6 @@ static void onboard_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t va
 	indicate_enabled = (value == BT_GATT_CCC_INDICATE);
 }
 
-/* STEP 13 - Define the configuration change callback function for the MYSENSOR characteristic */
-static void onboard_ccc_mysensor_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
-{
-	notify_mysensor_enabled = (value == BT_GATT_CCC_NOTIFY);
-}
 
 // This function is called when a remote device has acknowledged the indication at its host layer
 static void indicate_cb(struct bt_conn *conn, struct bt_gatt_indicate_params *params, uint8_t err)
@@ -83,22 +77,7 @@ static ssize_t write_led(struct bt_conn *conn, const struct bt_gatt_attr *attr, 
 	return len;
 }
 
-static ssize_t read_button(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf,
-			   uint16_t len, uint16_t offset)
-{
-	// get a pointer to button_state which is passed in the BT_GATT_CHARACTERISTIC() and stored in attr->user_data
-	const char *value = attr->user_data;
 
-	LOG_DBG("Attribute read, handle: %u, conn: %p", attr->handle, (void *)conn);
-
-	if (board.button_cb) {
-		// Call the application callback function to update the get the current value of the button
-		button_state = board.button_cb();
-		return bt_gatt_attr_read(conn, attr, buf, len, offset, value, sizeof(*value));
-	}
-
-	return 0;
-}
 
 /* LED Button Service Declaration */
 BT_GATT_SERVICE_DEFINE(
