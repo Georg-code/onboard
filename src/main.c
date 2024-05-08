@@ -93,6 +93,9 @@ static void simulate_data(void)
 }
 static void app_led_cb(bool led_state)
 {
+	gpio_pin_set_dt(&led, led_state);
+	printk("Changed to %d", led_state);
+	
 
 	
 }
@@ -161,10 +164,12 @@ int ret;
 		return -1;
 	}
 
-	gpio_pin_configure_dt(&signal, GPIO_OUTPUT_ACTIVE);
+	ret = gpio_pin_configure_dt(&signal, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return -1;
+	}
 
-/* Set the pin to its active level */
-//	gpio_pin_set_dt(&signal, 1);
+	
 
 
 	int err;
