@@ -3,6 +3,7 @@
 
 /dts-v1/;
 #include <nordic/nrf52820_qdaa.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
 
 / {
 	model = "OnBoardX1";
