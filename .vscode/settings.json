@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "*.page-template": "vue",
+    "*.layout-template": "vue",
+    "*.vue": "vue",
+    "stdbool.h": "c",
+    "gap.h": "c",
+    "devicetree.h": "c",
+    "types.h": "c",
+    "gpio.h": "c",
+    "device.h": "c"
+  }
+}

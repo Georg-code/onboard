@@ -1,0 +1,112 @@
+// Copyright (c) 2024 Nordic Semiconductor ASA
+// SPDX-License-Identifier: Apache-2.0
+
+/dts-v1/;
+#include <nordic/nrf52820_qdaa.dtsi>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+
+
+/ {
+	model = "OnBoardX1";
+	compatible = "georg-niggli,onboardx1";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+	};
+
+
+
+
+
+
+
+
+/* 
+
+	zephyr,user {
+		buzzer-gpios = <&gpioa 28 GPIO_ACTIVE_HIGH>;
+		motor-gpios = <&gpioa 30 GPIO_ACTIVE_HIGH>;
+	};
+*/
+	leds {
+		compatible = "gpio-leds";
+		status {
+			label = "status";
+			gpios = <&gpio0 20 0>;
+		};
+		motor {
+			label = "motor";
+			gpios = <&gpio0 30 0>;
+		};
+		buzzer {
+			label = "buzzer";
+			gpios = <&gpio0 28 0>;
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		alarm {
+			label = "alarm";
+			gpios = <&gpio0 8 0>;
+		};
+	};
+
+
+	
+
+
+	aliases {
+		albtn = &{/buttons/alarm/};
+		stled = &{/leds/status/};
+		moled = &{/leds/motor/};
+		bzled = &{/leds/buzzer/};
+	};
+
+	
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x0 0xc000>;
+		};
+		slot0_partition: partition@c000 {
+			label = "image-0";
+			reg = <0xc000 0x12000>;
+		};
+		slot1_partition: partition@1e000 {
+			label = "image-1";
+			reg = <0x1e000 0x12000>;
+		};
+		scratch_partition: partition@30000 {
+			label = "image-scratch";
+			reg = <0x30000 0xa000>;
+		};
+		storage_partition: partition@3a000 {
+			label = "storage";
+			reg = <0x3a000 0x6000>;
+		};
+	};
+};
+
+
+
+
+
+&gpio0 {
+	status = "okay";
+};
+
+
+&gpiote {
+	status = "okay";
+};
