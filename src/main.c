@@ -12,13 +12,29 @@
 #include <zephyr/bluetooth/conn.h>
 #include <dk_buttons_and_leds.h>
 #include "ble_attr.h"
-#include <zephyr/drivers/gpio.h>
+
+
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
+#include <zephyr/drivers/gpio.h>
 
+/* STEP 7 - Change the sleep time from 1000 ms to 100 ms */
+#define SLEEP_TIME_MS   100
 
+/* STEP 3.1 - Get the node identifier for button 1 through its alias sw0 */
+#define SW0_NODE	DT_ALIAS(albtn)
 
+/* STEP 3.2 - Get the device pointer. pin number, and pin's configuration flags through gpio_dt_spec */
 static const struct gpio_dt_spec button = GPIO_DT_SPEC_GET(SW0_NODE, gpios);
+
+/* LED0_NODE is the devicetree node identifier for the "led0" alias. */
+#define LED0_NODE DT_ALIAS(stled)
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+
+
+
 
 
 static struct bt_le_adv_param *adv_param = BT_LE_ADV_PARAM(
@@ -33,10 +49,7 @@ LOG_MODULE_REGISTER(Lesson4_Exercise2, LOG_LEVEL_INF);
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 
-#define RUN_STATUS_LED DK_LED1
-#define CON_STATUS_LED DK_LED2
-#define USER_LED DK_LED3
-#define USER_BUTTON DK_BTN1_MSK
+
 
 #define STACKSIZE 1024
 #define PRIORITY 7
@@ -44,7 +57,7 @@ LOG_MODULE_REGISTER(Lesson4_Exercise2, LOG_LEVEL_INF);
 #define RUN_LED_BLINK_INTERVAL 1000
 /* STEP 17 - Define the interval at which you want to send data at */
 #define NOTIFY_INTERVAL 500
-static bool app_button_state;
+
 /* STEP 15 - Define the data you want to stream over Bluetooth LE */
 static uint32_t app_sensor_value = 100;
 
@@ -68,13 +81,11 @@ static void simulate_data(void)
 }
 static void app_led_cb(bool led_state)
 {
-	dk_set_led(USER_LED, led_state);
+
+	gpio_pin_set_dt(&led,led_state);
 }
 
-static bool app_button_cb(void)
-{
-	return app_button_state;
-}
+
 
 /* STEP 18.1 - Define the thread function  */
 void send_data_thread(void)
@@ -91,18 +102,10 @@ void send_data_thread(void)
 
 static struct onboard app_callbacks = {
 	.led_cb = app_led_cb,
-	.button_cb = app_button_cb,
+
 };
 
-static void button_changed(uint32_t button_state, uint32_t has_changed)
-{
-	if (has_changed & USER_BUTTON) {
-		uint32_t user_button_state = button_state & USER_BUTTON;
-		/* STEP 6 - Send indication on a button press */
-		onboard_send_button_state_indicate(user_button_state);
-		app_button_state = user_button_state ? true : false;
-	}
-}
+
 static void on_connected(struct bt_conn *conn, uint8_t err)
 {
 	if (err) {
@@ -112,14 +115,14 @@ static void on_connected(struct bt_conn *conn, uint8_t err)
 
 	printk("Connected\n");
 
-	dk_set_led_on(CON_STATUS_LED);
+
 }
 
 static void on_disconnected(struct bt_conn *conn, uint8_t reason)
 {
 	printk("Disconnected (reason %u)\n", reason);
 
-	dk_set_led_off(CON_STATUS_LED);
+
 }
 
 struct bt_conn_cb connection_callbacks = {
@@ -136,7 +139,8 @@ int main(void)
 
 	LOG_INF("Starting Lesson 4 - Exercise 2 \n");
 
-	err = dk_leds_init();
+
+
 
 	if (err) {
 		LOG_ERR("LEDs init failed (err %d)\n", err);
@@ -164,6 +168,38 @@ int main(void)
 	}
 
 	LOG_INF("Advertising successfully started. You are ready to be safed\n");
+
+	
+int ret;
+
+	if (!device_is_ready(led.port)) {
+		return -1;
+	}
+	/* STEP 4 - Verify that the device is ready for use */
+	if (!device_is_ready(button.port)) {
+		return -1;
+	}
+
+	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return -1;
+	}
+
+	/* STEP 5 - Configure the pin connected to the button to be an input pin and set its hardware specifications */
+	ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (ret < 0) {
+		return -1;
+	}
+	while (1) {
+		/* STEP 6.1 - Read the status of the button and store it */
+        bool val = gpio_pin_get_dt(&button);
+
+		/* STEP 6.2 - Update the LED to the status of the button */
+        gpio_pin_set_dt(&led,val);
+
+        k_msleep(SLEEP_TIME_MS); // Put the main thread to sleep for 100ms for power optimization
+	}
+
 
 }
 /* STEP 18.2 - Define and initialize a thread to send data periodically */

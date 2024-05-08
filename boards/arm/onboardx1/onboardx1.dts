@@ -43,6 +43,17 @@
 			gpios = <&gpio0 8 0>;
 		};
 	};
+
+
+	
+
+
+	aliases {
+		albtn = &{/buttons/alarm/};
+		stled = &{/leds/status/};
+	};
+
+	
 };
 
 &flash0 {
@@ -79,5 +90,10 @@
 
 
 &gpio0 {
+	status = "okay";
+};
+
+
+&gpiote {
 	status = "okay";
 };

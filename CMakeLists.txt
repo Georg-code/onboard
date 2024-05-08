@@ -16,3 +16,7 @@ target_sources(app PRIVATE
 
 # NORDIC SDK APP END
 zephyr_library_include_directories(.)
+
+
+
+
