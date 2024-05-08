@@ -5,6 +5,8 @@
 #include <nordic/nrf52820_qdaa.dtsi>
 #include <zephyr/dt-bindings/gpio/gpio.h>
 
+
+
 / {
 	model = "OnBoardX1";
 	compatible = "georg-niggli,onboardx1";
@@ -22,18 +24,26 @@
 
 
 
-
+/* 
 
 	zephyr,user {
-		buzzer-gpios = <&gpio0 28 0>;
-		motor-gpios = <&gpio0 30 0>;
+		buzzer-gpios = <&gpioa 28 GPIO_ACTIVE_HIGH>;
+		motor-gpios = <&gpioa 30 GPIO_ACTIVE_HIGH>;
 	};
-
+*/
 	leds {
 		compatible = "gpio-leds";
 		status {
 			label = "status";
 			gpios = <&gpio0 20 0>;
+		};
+		motor {
+			label = "motor";
+			gpios = <&gpio0 30 0>;
+		};
+		buzzer {
+			label = "buzzer";
+			gpios = <&gpio0 28 0>;
 		};
 	};
 
@@ -52,6 +62,8 @@
 	aliases {
 		albtn = &{/buttons/alarm/};
 		stled = &{/leds/status/};
+		moled = &{/leds/motor/};
+		bzled = &{/leds/buzzer/};
 	};
 
 	
