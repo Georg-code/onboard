@@ -9,5 +9,6 @@
     "types.h": "c",
     "gpio.h": "c",
     "device.h": "c"
-  }
+  },
+  "nrf-connect.applications": ["${workspaceFolder}\\software\\central"]
 }

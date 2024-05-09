@@ -1,0 +1,11 @@
+{
+  "C_Cpp.errorSquiggles": "enabled",
+  "files.associations": {
+    "*.page-template": "vue",
+    "*.layout-template": "vue",
+    "*.vue": "vue",
+    "bluetooth.h": "c",
+    "hci.h": "c",
+    "byteorder.h": "c"
+  }
+}
